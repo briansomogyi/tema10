@@ -1,25 +1,26 @@
-class Stair {
-    constructor(x, y, width, height) {
+class RoundedRect {
+    constructor(x, y, w, h, r) {
       this.x = x;
       this.y = y;
-      this.width = width;
-      this.height = height;
+      this.w = w;
+      this.h = h;
+      this.r = r;
     }
   
     display() {
-      rect(this.x, this.y, this.width, this.height);
+      rect(this.x, this.y, this.w, this.h, this.r);
     }
   }
   
-  function drawFractalStairs(x, y, width, height, levels) {
+  function drawFractalRoundedRects(x, y, w, h, r, levels) {
     if (levels === 0) {
       return;
     }
     
-    let stair = new Stair(x, y, width, height);
-    stair.display();
+    let rect = new RoundedRect(x, y, w, h, r);
+    rect.display();
     
-    drawFractalStairs(x + width / 2, y - height / 2, width / 2, height / 2, levels - 1);
+    drawFractalRoundedRects(x + w / 2, y - h / 2, w / 2, h / 2, r / 2, levels - 1);
   }
   
   function setup() {
@@ -29,7 +30,8 @@ class Stair {
   function draw() {
     background(220);
     
-    let levels = 5; // You can change the number of levels here
-    drawFractalStairs(50, height - 50, 80, 20, levels);
+    let levels = 5; // Number of fractal levels
+    let cornerRadius = 20; // Initial corner radius
+    drawFractalRoundedRects(50, height - 50, 80, 20, cornerRadius, levels);
   }
   
