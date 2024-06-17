@@ -12,15 +12,29 @@ class RoundedRect {
     }
   }
   
-  function drawFractalRoundedRects(x, y, w, h, r, levels) {
+  function drawSpiralFractal(x, y, w, h, r, angle, levels) {
     if (levels === 0) {
       return;
     }
     
-    let rect = new RoundedRect(x, y, w, h, r);
+    push(); // Save the current state of transformation
+    translate(x, y); // Move to the new origin
+    rotate(angle); // Rotate by the given angle
+    
+    let rect = new RoundedRect(0, 0, w, h, r);
     rect.display();
     
-    drawFractalRoundedRects(x + w / 2, y - h / 2, w / 2, h / 2, r / 2, levels - 1);
+    pop(); // Restore the previous state of transformation
+    
+    // Calculate new parameters for the next level
+    let newW = w * 0.8; // Scale down width
+    let newH = h * 0.8; // Scale down height
+    let newR = r * 0.8; // Scale down corner radius
+    let newAngle = angle + PI / 6; // Increase angle
+    let newX = x + (w - newW) * cos(angle) - h * sin(angle);
+    let newY = y + (w - newW) * sin(angle) + h * cos(angle);
+    
+    drawSpiralFractal(newX, newY, newW, newH, newR, newAngle, levels - 1);
   }
   
   function setup() {
@@ -30,8 +44,8 @@ class RoundedRect {
   function draw() {
     background(220);
     
-    let levels = 5; // Number of fractal levels
+    let levels = 10; // Number of fractal levels
     let cornerRadius = 20; // Initial corner radius
-    drawFractalRoundedRects(50, height - 50, 80, 20, cornerRadius, levels);
+    drawSpiralFractal(200, 200, 80, 20, cornerRadius, PI / 4, levels);
   }
   
