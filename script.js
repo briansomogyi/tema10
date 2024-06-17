@@ -1,53 +1,64 @@
-class Stair {
-    constructor(x, y, width, height) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-    }
-  
-    display() {
-      rect(this.x, this.y, this.width, this.height);
-    }
+let angle;
+let branchLength;
+
+class Branch {
+  constructor(start, end) {
+    this.start = start;
+    this.end = end;
+    this.finished = false;
   }
-  
-  class FractalStairs {
-    constructor(x, y, width, height, levels) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      this.levels = levels;
-      this.stairs = [];
-      this.createStairs();
-    }
-  
-    createStairs() {
-      let w = this.width;
-      let h = this.height;
-      for (let i = 0; i < this.levels; i++) {
-        this.stairs.push(new Stair(this.x + i * w, this.y - i * h, w, h));
-        w *= 0.5;
-        h *= 0.5;
+
+  show() {
+    stroke(255);
+    line(this.start.x, this.start.y, this.end.x, this.end.y);
+  }
+
+  branch(angleA, angleB) {
+    let dir = p5.Vector.sub(this.end, this.start);
+    dir.rotate(angleA);
+    dir.mult(0.67);
+    let newEnd = p5.Vector.add(this.end, dir);
+    let right = new Branch(this.end, newEnd);
+
+    dir = p5.Vector.sub(this.end, this.start);
+    dir.rotate(angleB);
+    dir.mult(0.67);
+    newEnd = p5.Vector.add(this.end, dir);
+    let left = new Branch(this.end, newEnd);
+
+    return [right, left];
+  }
+}
+
+function setup() {
+  createCanvas(400, 400);
+  let start = createVector(width / 2, height);
+  let end = createVector(width / 2, height - 100);
+  let root = new Branch(start, end);
+
+  angle = PI / 4;
+  branchLength = 100;
+
+  let tree = [];
+  tree.push(root);
+
+  let current = [];
+  for (let i = 0; i < 6; i++) {
+    for (let j = tree.length - 1; j >= 0; j--) {
+      if (!tree[j].finished) {
+        current.push(...tree[j].branch(angle, -angle));
+        tree[j].finished = true;
       }
     }
-  
-    display() {
-      for (let stair of this.stairs) {
-        stair.display();
-      }
-    }
+    tree.push(...current);
+    current = [];
   }
+}
+
+function draw() {
+  background(51);
   
-  let fractalStairs;
-  
-  function setup() {
-    createCanvas(400, 400);
-    fractalStairs = new FractalStairs(50, height - 50, 80, 20, 5);
+  for (let i = tree.length - 1; i >= 0; i--) {
+    tree[i].show();
   }
-  
-  function draw() {
-    background(220);
-    fractalStairs.display();
-  }
-  
+}
